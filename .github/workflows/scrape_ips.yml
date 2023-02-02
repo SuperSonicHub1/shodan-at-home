@@ -1,0 +1,32 @@
+name: "Scrape IPs"
+
+on:
+  schedule:
+    # Scrape IPs once a week at 12:00 AM every Sunday :)
+    - cron: "0 0 * * 0"
+
+jobs:
+  scrape_ips:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run Nmap script
+        run: |
+          apt install nmap
+      
+      - name: Scrape IPS
+        run: nmap -oX <nmap_results.json> -v -A --webxml 80 example.com 
+
+      - name: Store the results
+        uses: actions/upload-artifact@v2
+        with:
+          name: nmap_results
+          path: nmap_results.txt
+
+      - name: Commit and push the changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Update nmap_results.txt"
+          push: true
