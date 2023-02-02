@@ -20,9 +20,9 @@ jobs:
       - name: Download and process JSON
         run: |
           mkdir -p ip_ranges
-          curl ${{ matrix.source }} | jq "[.prefixes[] | .ip_prefix]" > ip_ranges/${{matrix.url}}.json
+          curl ${{ matrix.url }} | jq "[.prefixes[] | .ip_prefix]" > ip_ranges/${{matrix.source}}.json
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: 'Updated IP ranges for "${{ matrix.source }}"'
-          file_pattern: ip_ranges/${{matrix.url}}.json
+          file_pattern: ip_ranges/${{matrix.source}}.json
