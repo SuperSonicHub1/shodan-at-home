@@ -1,0 +1,27 @@
+name: "Scrape IP ranges"
+
+on:
+  schedule:
+    # Scrape IPs once a week
+    - cron: "0 0 * * 0"
+
+jobs:
+  scrape_ips:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        source: [aws]
+        include:
+          - source: aws
+            url: "https://ip-ranges.amazonaws.com/ip-ranges.json"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download and process JSON
+        run: |
+          mkdir -p ip_ranges
+          curl ${{ matrix.source }} | jq "[.prefixes[] | .ip_prefix]" > ip_ranges/${{matrix.url}}.json
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 'Updated IP ranges for "${{ matrix.source }}"'
+          file_pattern: ip_ranges/${{matrix.url}}.json
