@@ -28,3 +28,4 @@ jobs:
           git add ip_ranges/${{matrix.source}}.json
           timestamp=$(date -u)
           git commit -m "Updated IP range source "${{matrix.source}}" at ${timestamp}"
+          git push
