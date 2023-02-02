@@ -1,6 +1,7 @@
 name: "Scrape IP ranges"
 
 on:
+  workflow_dispatch:
   schedule:
     # Scrape IPs once a week
     - cron: "0 0 * * 0"
