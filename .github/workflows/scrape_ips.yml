@@ -1,32 +1,44 @@
-name: "Scrape IPs"
+name: Scan IPs
 
 on:
   schedule:
-    # Scrape IPs once a week at 12:00 AM every Sunday :)
+    # Scan IPs once a week
     - cron: "0 0 * * 0"
 
+env:
+  # Define the list of JSON URLs
+  JSON_URLS: |
+    https://ip-ranges.amazonaws.com/ip-ranges.json
+    https://www.gstatic.com/ipranges/goog.json
+    https://www.gstatic.com/ipranges/cloud.json
+    https://endpoints.office.com/endpoints/worldwide?clientrequestid=b10c5ed1-bad1-445f-b386-b919946339a7
+    https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json
+    https://api.github.com/meta
+    https://geoip.linode.com/
+    https://raw.githubusercontent.com/lord-alfred/ipranges/main/amazon/ipv4.txt
+
 jobs:
-  scrape_ips:
+  scan_ips:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Run Nmap script
-        run: |
-          apt install nmap
-      
-      - name: Scrape IPS
-        run: nmap -oX <nmap_results.json> -v -A --webxml 80 example.com 
+    - name: Fetch JSON data
+      id: fetch_json
+      run: |
+        for url in $(echo "$JSON_URLS" | tr '\n' ' '); do
+          curl -sSL $url | jq -r '.prefixes[].ip_prefix' >> ip_prefixes.txt
+        done
 
-      - name: Store the results
-        uses: actions/upload-artifact@v2
-        with:
-          name: nmap_results
-          path: nmap_results.txt
+    - name: Scan IPs
+      uses: actions/nmap@v1
+      with:
+        args: -iL ip_prefixes.txt
 
-      - name: Commit and push the changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "Update nmap_results.txt"
-          push: true
+    - name: Upload scan results
+      uses: actions/upload-artifact@v2
+      with:
+        name: scan_results
+        path: ip_prefixes.txt
