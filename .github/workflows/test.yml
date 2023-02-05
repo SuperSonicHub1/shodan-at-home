@@ -1,0 +1,36 @@
+name: "Scrape IP ranges"
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Scrape IPs once a week
+    - cron: "0 0 * * 0"
+
+jobs:
+  scrape_ips:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        source: [aws, google, google_v2, oracle]
+        include:
+          - source: aws
+            url: "https://ip-ranges.amazonaws.com/ip-ranges.json"
+          - source: google
+            url: "https://www.gstatic.com/ipranges/goog.json"
+          - source: google_v2
+            url: "https://www.gstatic.com/ipranges/cloud.json"
+          - source: oracle
+            url: "https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download and process JSON
+        run: |
+          mkdir -p ip_ranges
+          curl ${{ matrix.url }} | jq "[.prefixes[] | .ip_prefix]" > ip_ranges/${{matrix.source}}.json
+      - name: Commit JSON
+        run: |
+          git config user.name "Automated"
+          git config user.email "actions@users.noreply.github.com"
+          git add ip_ranges/${{matrix.source}}.json
+          timestamp=$(date -u)
+          git commit -m "Updated IP range source "${{matrix.source}}" at ${timestamp}"
