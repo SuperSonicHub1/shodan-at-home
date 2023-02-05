@@ -25,6 +25,9 @@ jobs:
         run: |
           mkdir -p ip_ranges
           curl ${{ matrix.url }} | jq "[.prefixes[] | .ip_prefix]" > ip_ranges/${{matrix.source}}.json
+      - name: Install nmap (i forgot)
+        run: |
+          sudo apt-get update && sudo apt-get install nmap -y
       - name: Scan IPs with nmap
         run: |
           nmap -iL ip_ranges/${{matrix.source}}.json -oX scan_results/${{matrix.source}}_scan.xml -v -A
