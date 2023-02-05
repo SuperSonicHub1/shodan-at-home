@@ -4,14 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     - cron: '0 0 * * 0' # Run every Sunday at midnight
-
-env:
-  JSON_URLS: |
-    https://ip-ranges.amazonaws.com/ip-ranges.json
-    https://www.gstatic.com/ipranges/goog.json
-    https://www.gstatic.com/ipranges/cloud.json
-    https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json
-
+    
 jobs:
   nmap-scan:
     runs-on: ubuntu-latest
@@ -20,8 +13,14 @@ jobs:
         source: [aws]
         include:
         - source: aws
-          url: ${{ env.JSON_URLS }}
-
+          url: "https://ip-ranges.amazonaws.com/ip-ranges.json"
+        -source: Google
+          "https://www.gstatic.com/ipranges/goog.json"
+        -source: Google v2
+          "https://www.gstatic.com/ipranges/cloud.json"
+        -source: Oracle
+          "https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json"
+          
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
