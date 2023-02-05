@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        source: [aws, Google, Google v2, Oracle]
+        source: [aws, Google, Google v2]
         include:
           - source: aws
             url: "https://ip-ranges.amazonaws.com/ip-ranges.json"
