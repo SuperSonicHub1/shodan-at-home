@@ -10,16 +10,16 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        source: [aws]
         include:
         - source: aws
           url: "https://ip-ranges.amazonaws.com/ip-ranges.json"
-        -source: Google
-          "https://www.gstatic.com/ipranges/goog.json"
-        -source: Google v2
-          "https://www.gstatic.com/ipranges/cloud.json"
-        -source: Oracle
-          "https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json"
+        - source: Google
+          url: "https://www.gstatic.com/ipranges/goog.json"
+        - source: Google_v2
+          url: "https://www.gstatic.com/ipranges/cloud.json"
+        - source: Oracle
+          url: "https://docs.oracle.com/en-us/iaas/tools/public_ip_ranges.json"
+
           
     steps:
     - name: Checkout code
